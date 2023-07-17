@@ -1,50 +1,14 @@
-### Note: recently included support for recurrent neural networks as well.
+import numpy as np
+import tensorflow as tf
+from PIL import Image
 
-# FeedForwardModel
-A library that enables incredibly **simple creation of feed forward neural models** in TensorFlow.
+from model import *
+import trainer
 
-Simply specify the input shape, output shape, and a list of components (or layers) to make up the network.
-The library then figures out the dimensions of each component, initializes each component, and builds the model automatically.
-Most importantly, the model is able to infer the sizes of intermediate layers automatically, requiring you to only specify the essentials.
+##############################################################################
+# Model
 
-This enables you to make quick changes to your entire model in just a few lines.
-
-## Examples
-
-**classifier_test.py**: An example implementation of a simple multi-class classifier.
-
-The model used in this example:
-~~~~
-...
-model = FeedForwardModel(2, 4, [FullyConnectedComponent(8),
-                                ActivationComponent(tf.nn.sigmoid),
-                                DropoutComponent(0.99),
-                                FullyConnectedComponent()])
-x, out = model.build()
-...
-~~~~
-
----
-**cnn_test.py**: An example implementation of a CNN. Uses the MNIST dataset.
-
-The model used in this example:
-~~~~
-...
-model = FeedForwardModel([28, 28], 10, [Conv2DComponent(5, num_kernels=20, stride=2),
-                                        ActivationComponent(tf.nn.relu),
-                                        Conv2DComponent(4, num_kernels=10),
-                                        ActivationComponent(tf.nn.relu),
-                                        Conv2DComponent(3, num_kernels=5),
-                                        ActivationComponent(tf.nn.relu),
-                                        DropoutComponent(0.98),
-                                        FullyConnectedComponent()])
-x, out = model.build()
-...
-~~~~
-
-### VGG16 for ImageNet
-Here is an implementation of the VGG16 model for the ImageNet classification task -- classifying images of size 224x224x3 into 1000 categories:
-~~~
+# This model achieves about 98.6% accuracy after 8 epochs. About 98.0% after only 4 epochs.
 model = FeedForwardModel([224, 224, 3], 1000, [Conv2DComponent(3, num_kernels=64),
                                                ActivationComponent(tf.nn.relu),
                                                Conv2DComponent(3, num_kernels=64),
@@ -78,4 +42,48 @@ model = FeedForwardModel([224, 224, 3], 1000, [Conv2DComponent(3, num_kernels=64
                                                ActivationComponent(tf.nn.relu),
                                                FullyConnectedComponent()])
 x, out = model.build()
-~~~
+
+print
+print(model) # Displays configured model components
+print
+
+learning_rate = 0.01
+
+### Other variables used in training/evaluation
+loss_fn = lambda out, y: tf.reduce_mean(
+                            tf.nn.sparse_softmax_cross_entropy_with_logits(logits=out, labels=y))
+optimizer_fn = lambda loss: tf.train.GradientDescentOptimizer(learning_rate).minimize(loss)
+accuracy_fn = lambda out, y: tf.reduce_mean(tf.cast(tf.nn.in_top_k(out, y, 1), tf.float32))
+
+##############################################################################
+# Data loader and setup
+print('Loading images.')
+imagenetdata = Image('./imagenet')
+training_data, training_labels = imagenetdata.load_training()
+validation_data, validation_labels = imagenetdata.load_testing()
+print('Training images: {}'.format(len(training_data)))
+print('Validation images: {}'.format(len(validation_data)))
+
+print('Reshaping images..')
+training_data = np.reshape(training_data, [-1, 28, 28])
+validation_data = np.reshape(validation_data, [-1, 28, 28])
+
+##############################################################################
+# Training
+
+trainer = trainer.SupervisedTrainer(x, out,
+                                    loss_display_interval=100,
+                                    accuracy_display_interval=100,
+                                    show_accuracy=False,
+                                    loss_display_starting_iteration=5) # Loss super high at beginning
+
+trainer.train(training_data,
+              training_labels,
+              validation_data,
+              validation_labels,
+              loss_fn=loss_fn,#loss function
+              optimizer_fn=optimizer_fn,
+              accuracy_fn=accuracy_fn,
+              batch_size=100, # Trains in batches of 100 training data points
+              validation_set_size=10000, # Evaluates on all 10000 validation data points
+              validation_interval=200) # Evaluates validation data every 200 batches
