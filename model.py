@@ -1,7 +1,7 @@
 import numpy as np
-import tensorflow as tf
+import tensorflow.compat.v1 as tf
 import math
-
+tf.disable_v2_behavior()
 class Model(object):
     def __init__(self, input_shape, output_shape, components):
         self.input_shape = input_shape and \
@@ -212,12 +212,12 @@ class Component(object):
               '=' + ('???' if self.direct_input_shape and None not in recurrent_shapes and \
                      not all(map(lambda s: s[1:] == self.direct_input_shape[1:], recurrent_shapes)) \
                      else str(self.input_shape)))
-                if len(self.recurrent_inputs) else '') + \
+                if len(list(self.recurrent_inputs)) else '') + \
             ', output_shape=' + str(self.output_shape) + \
             ((', recurrent_inputs=' + str(map(lambda r: r.name, self.recurrent_inputs)))
-                if len(self.recurrent_inputs) else '') + \
-            ', '.join([''] + map(lambda k: k + '=' + str(self.params[k]), self.params)) + \
-            ', '.join([''] + map(lambda k: k + '=' + str(self.kwargs[k]), self.kwargs)) + \
+                if len(list(self.recurrent_inputs)) else '') + \
+            ', '.join([''] + list(map(lambda k: k + '=' + str(self.params[k]), self.params))) + \
+            ', '.join([''] + list(map(lambda k: k + '=' + str(self.kwargs[k]), self.kwargs))) + \
             ')').replace('None', '???')
     
     

@@ -1,11 +1,11 @@
 import numpy as np
-import tensorflow as tf
+import tensorflow.compat.v1 as tf
 import matplotlib.pyplot as plt
 import math
 import time
 from display_utils import DynamicConsoleTable
 from sound_utils import Sounds
-
+tf.disable_v2_behavior()
 class SupervisedTrainer(object):
     
     def __init__(self,
@@ -219,7 +219,7 @@ class SupervisedTrainer(object):
                 training_labels_permuted = np.array(training_labels)[training_data_indices]
                 training_data_batches = []
                 training_label_batches = []
-                for i in range(num_training_batches):
+                for i in range(int(num_training_batches)):
                     training_data_batches.append(
                         training_data_permuted[i*batch_size:(i+1)*batch_size])
                     training_label_batches.append(
@@ -230,7 +230,7 @@ class SupervisedTrainer(object):
                     self.sounds.alert()
 
                 # Trains on the data, in batches
-                for i in range(num_training_batches):
+                for i in range(int(num_training_batches)):
                     iteration += 1
                     data_batch = training_data_batches[i]
                     labels_batch = training_label_batches[i]

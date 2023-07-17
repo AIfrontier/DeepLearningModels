@@ -2,7 +2,7 @@ import pyaudio
 import numpy
 import math
 import threading
-import Queue
+import queue
 
 class Sounds(object):
     global RATE
@@ -12,7 +12,7 @@ class Sounds(object):
         self.p = None
         self.stream = None
         self.thr = None
-        self.queue = Queue.Queue()
+        self.queue = queue.Queue()
     
     def open(self):
         if self.thr is None or not self.thr.is_alive():
@@ -38,7 +38,7 @@ class Sounds(object):
             self.thr.join()
         except:
             pass
-        self.queue = Queue.Queue()
+        self.queue = queue.Queue()
         self.stream.close()
         self.p.terminate()
         

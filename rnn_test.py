@@ -8,7 +8,7 @@ model = RecurrentModel(2, 1, [FullyConnectedComponent(2, recurrent_inputs=['a'])
 x, out, recurrent_inputs, recurrent_outputs = model.build()
 
 print
-print model # Displays configured model components
+print (model) # Displays configured model components
 print
 
 initialize = tf.global_variables_initializer()

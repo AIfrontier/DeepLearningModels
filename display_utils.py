@@ -54,7 +54,7 @@ class DynamicConsoleTable(object):
         if not self.updated:
             self.update()
         self.updated = False
-        print '\n' + (self.divider if not heavy else self.heavy_divider)
+        print ('\n' + (self.divider if not heavy else self.heavy_divider))
     
     def update(self, *args):
         self.updated = True
