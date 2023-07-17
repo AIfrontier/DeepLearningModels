@@ -57,7 +57,7 @@ trainer.train(training_data,
               training_labels,
               validation_data,
               validation_labels,
-              loss_fn=loss_fn,
+              loss_fn=loss_fn,#loss function
               optimizer_fn=optimizer_fn,
               accuracy_fn=accuracy_fn,
               batch_size=100, # Trains in batches of 100 training data points

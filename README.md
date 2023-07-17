@@ -11,7 +11,7 @@ This enables you to make quick changes to your entire model in just a few lines.
 
 ## Examples
 
-**fc_test.py**: An example implementation of a simple multi-class classifier.
+**classifier_test.py**: An example implementation of a simple multi-class classifier.
 
 The model used in this example:
 ~~~~

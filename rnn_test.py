@@ -17,5 +17,5 @@ with tf.Session() as session:
     
     val_out, hidden_a = session.run([out, recurrent_outputs['a']],
                                  feed_dict={x: [[1.0, 0.0]], recurrent_inputs['a']: [[0.0]]})
-    print val_out
-    print hidden_a
+    print (val_out)
+    print (hidden_a)
